@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  database:
+    image: mysql:8.0
+    container_name: taskmanager-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${DB_NAME:-taskmanager}
+      MYSQL_USER: ${DB_USER:-taskmanager}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-taskmanager123}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - taskmanager-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taskmanager-backend
+    environment:
+      NODE_ENV: production
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_USER: ${DB_USER:-taskmanager}
+      DB_PASSWORD: ${DB_PASSWORD:-taskmanager123}
+      DB_NAME: ${DB_NAME:-taskmanager}
+      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret_key_minimum_32_characters_change_this_in_production}
+      JWT_EXPIRATION: 24h
+      BCRYPT_COST_FACTOR: 10
+      PORT: 3000
+      CORS_ORIGIN: "*"
+    ports:
+      - "3000:3000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - taskmanager-network
+    volumes:
+      - ./backend/logs:/app/logs
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: taskmanager-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:3000
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - taskmanager-network
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  taskmanager-network:
+    driver: bridge

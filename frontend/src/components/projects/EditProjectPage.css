@@ -1,0 +1,11 @@
+.edit-project-page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .edit-project-page {
+    padding: 1rem;
+  }
+}
