@@ -81,16 +81,18 @@ router.get('/tasks/:id', authenticate, async (req, res, next) => {
 
     // Check access to project
     const hasViewAll = hasPermission(req.user.role_id, 'view_all_projects');
-    if (!hasViewAll) {
-      const assigned = await isUserAssigned(task.project_id, userId);
-      if (!assigned) {
-        return res.status(403).json({
-          success: false,
-          error: 'Permission denied: You are not assigned to this project',
-          timestamp: new Date().toISOString()
-        });
-      }
+    const assigned = await isUserAssigned(task.project_id, userId);
+    
+    if (!hasViewAll && !assigned) {
+      return res.status(403).json({
+        success: false,
+        error: 'Permission denied: You are not assigned to this project',
+        timestamp: new Date().toISOString()
+      });
     }
+
+    // Add is_user_assigned flag for frontend
+    task.is_user_assigned = assigned;
 
     res.status(200).json({
       success: true,

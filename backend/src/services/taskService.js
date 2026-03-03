@@ -41,10 +41,12 @@ const getTaskById = async (id) => {
   const tasks = await query(
     `SELECT t.*, 
             u1.name as creator_name,
-            u2.name as assignee_name
+            u2.name as assignee_name,
+            p.created_by as project_created_by
      FROM tasks t
      LEFT JOIN users u1 ON t.created_by = u1.id
      LEFT JOIN users u2 ON t.assigned_to = u2.id
+     LEFT JOIN projects p ON t.project_id = p.id
      WHERE t.id = ?`,
     [id]
   );

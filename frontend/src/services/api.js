@@ -144,7 +144,10 @@ export const getTasks = (projectId, filters = {}) => {
 };
 
 export const getTask = (id) => {
-  return api.get(`/tasks/${id}`);
+  return api.get(`/tasks/${id}`).then(response => {
+    // Extract task from nested data structure
+    return { data: response.data.task };
+  });
 };
 
 export const createTask = (projectId, data) => {
@@ -152,7 +155,10 @@ export const createTask = (projectId, data) => {
 };
 
 export const updateTask = (id, data) => {
-  return api.put(`/tasks/${id}`, data);
+  return api.put(`/tasks/${id}`, data).then(response => {
+    // Extract task from nested data structure
+    return { data: response.data.task };
+  });
 };
 
 export const deleteTask = (id) => {
@@ -161,11 +167,17 @@ export const deleteTask = (id) => {
 
 // Comments
 export const getComments = (taskId) => {
-  return api.get(`/tasks/${taskId}/comments`);
+  return api.get(`/tasks/${taskId}/comments`).then(response => {
+    // Extract comments from nested data structure
+    return { data: response.data.comments };
+  });
 };
 
 export const addComment = (taskId, content) => {
-  return api.post(`/tasks/${taskId}/comments`, { content });
+  return api.post(`/tasks/${taskId}/comments`, { content }).then(response => {
+    // Extract comment from nested data structure
+    return { data: response.data.comment };
+  });
 };
 
 // Audit Logs

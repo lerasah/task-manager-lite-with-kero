@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import PasswordResetRequestPage from './components/PasswordResetRequestPage';
 import ResetPasswordPage from './components/ResetPasswordPage';
 import { ProjectDetail } from './components/projects';
+import { TaskDetail, TaskForm } from './components/tasks';
 import './App.css';
 
 function App() {
@@ -46,6 +47,24 @@ function App() {
                   <ProtectedRoute>
                     <Header />
                     <ProjectDetail />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/projects/:id/tasks/new"
+                element={
+                  <ProtectedRoute>
+                    <Header />
+                    <TaskForm />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tasks/:id"
+                element={
+                  <ProtectedRoute>
+                    <Header />
+                    <TaskDetail />
                   </ProtectedRoute>
                 }
               />
